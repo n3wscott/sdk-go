@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -67,23 +66,23 @@ func (e Event) MarshalBinary(req *http.Request) error {
 
 	req.Header = header
 
+	var b []byte
+	var err error
+
 	data := e.Data
-	buffer := &bytes.Buffer{}
 	switch req.Header.Get("Content-Type") {
 	case "application/json":
-		json.NewEncoder(buffer).Encode(data)
+		b, err = json.Marshal(data)
 	case "application/xml":
-		xml.NewEncoder(buffer).Encode(data)
-	default:
-		buffer = bytes.NewBuffer(data.([]byte))
+		b, err = xml.Marshal(data)
 	}
 
-	req.Body = ioutil.NopCloser(buffer)
-	req.ContentLength = int64(buffer.Len())
-	req.GetBody = func() (io.ReadCloser, error) {
-		reader := bytes.NewReader(buffer.Bytes())
-		return ioutil.NopCloser(reader), nil
+	if err != nil {
+		return err
 	}
+
+	req.ContentLength = int64(len(b))
+	req.Body = ioutil.NopCloser(bytes.NewReader(b))
 
 	return nil
 }
