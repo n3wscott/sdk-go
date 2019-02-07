@@ -13,25 +13,28 @@ import (
 type Event struct {
 	// CloudEventsVersion is a mandatory property
 	// https://github.com/cloudevents/spec/blob/v0.1/spec.md#cloudeventsversion
-	CloudEventsVersion string `json:"cloudeventsversion" cloudevents:"ce-cloudeventsversion,required"`
+	CloudEventsVersion string `json:"cloudEventsVersion" cloudevents:"ce-cloudeventsversion,required"`
 	// EventType is a mandatory property
 	// https://github.com/cloudevents/spec/blob/v0.1/spec.md#eventtype
-	EventType string `json:"eventtype" cloudevents:"ce-eventtype,required"`
+	EventType string `json:"eventType" cloudevents:"ce-eventtype,required"`
+	// EventTypeVersion is an optional property
+	// https://github.com/cloudevents/spec/blob/v0.1/spec.md#eventtypeversion
+	EventTypeVersion string `json:"eventTypeVersion,omitempty" cloudevents:"ce-eventtypeversion"`
 	// Source is a mandatory property
 	// https://github.com/cloudevents/spec/blob/v0.1/spec.md#source
 	Source url.URL `json:"source" cloudevents:"ce-source,required"`
 	// EventID is a mandatory property
 	// https://github.com/cloudevents/spec/blob/v0.1/spec.md#eventid
-	EventID string `json:"eventid" cloudevents:"ce-eventid,required"`
+	EventID string `json:"eventID" cloudevents:"ce-eventid,required"`
 	// EventTime is an optional property
 	// https://github.com/cloudevents/spec/blob/v0.1/spec.md#eventtime
-	EventTime *time.Time `json:"eventtime,omitempty" cloudevents:"ce-eventtime"`
+	EventTime *time.Time `json:"eventTime,omitempty" cloudevents:"ce-eventtime"`
 	// SchemaURL is an optional property
 	// https://github.com/cloudevents/spec/blob/v0.1/spec.md#schemaurl
-	SchemaURL url.URL `json:"schemaurl,omitempty" cloudevents:"ce-schemaurl"`
+	SchemaURL url.URL `json:"schemaURL,omitempty" cloudevents:"ce-schemaurl"`
 	// ContentType is an optional property
 	// https://github.com/cloudevents/spec/blob/v0.1/spec.md#contenttype
-	ContentType string `json:"contenttype,omitempty" cloudevents:"content-type"`
+	ContentType string `json:"contentType,omitempty" cloudevents:"content-type"`
 	// Data is an optional property
 	// https://github.com/cloudevents/spec/blob/v0.1/spec.md#data-1
 	Data interface{} `json:"data,omitempty" cloudevents:",body"`
