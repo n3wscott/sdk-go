@@ -12,6 +12,14 @@ const Version02 = "0.2"
 
 // Event interface is a generic abstraction over all possible versions and implementations of CloudEvents.
 type Event interface {
+	// EventReader includes reader methods.
+	EventReader
+	// EventReader includes writer methods.
+	EventWriter
+}
+
+// EventReader interface is a generic read abstraction over all possible versions and implementations of CloudEvents.
+type EventReader interface {
 	// CloudEventVersion returns the version of Event specification followed by the underlying implementation.
 	CloudEventVersion() string
 	// Get takes a property name and, if it exists, returns the value of that property. The ok return value can
@@ -36,7 +44,12 @@ type Event interface {
 	// if the property does not exist or the value cannot be converted or parsed into a url.URL.
 	GetURL(property string) (value url.URL, ok bool)
 	// Set sets the property value
-	Set(property string, value interface{})
 	// Properties returns a map of all event properties as keys and their mandatory status as values
 	Properties() map[string]bool
+}
+
+// EventWriter interface is a generic write abstraction over all possible versions and implementations of CloudEvents.
+type EventWriter interface {
+	// Set sets the property value
+	Set(property string, value interface{})
 }

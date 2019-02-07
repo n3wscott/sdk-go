@@ -63,11 +63,11 @@ func (_m *HTTPCloudEventConverter) Read(t reflect.Type, req *http.Request) (clou
 }
 
 // Write provides a mock function with given fields: t, req, event
-func (_m *HTTPCloudEventConverter) Write(t reflect.Type, req *http.Request, event cloudevents.Event) error {
+func (_m *HTTPCloudEventConverter) Write(t reflect.Type, req *http.Request, event cloudevents.EventReader) error {
 	ret := _m.Called(t, req, event)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(reflect.Type, *http.Request, cloudevents.Event) error); ok {
+	if rf, ok := ret.Get(0).(func(reflect.Type, *http.Request, cloudevents.EventReader) error); ok {
 		r0 = rf(t, req, event)
 	} else {
 		r0 = ret.Error(0)

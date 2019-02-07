@@ -53,7 +53,7 @@ func (e HTTPMarshaller) FromRequest(req *http.Request) (cloudevents.Event, error
 }
 
 // ToRequest populates an http Request with the given CloudEvent
-func (e HTTPMarshaller) ToRequest(req *http.Request, event cloudevents.Event) error {
+func (e HTTPMarshaller) ToRequest(req *http.Request, event cloudevents.EventReader) error {
 	if req == nil {
 		return cloudevents.IllegalArgumentError("req")
 	}
@@ -62,7 +62,12 @@ func (e HTTPMarshaller) ToRequest(req *http.Request, event cloudevents.Event) er
 		return cloudevents.IllegalArgumentError("event")
 	}
 
-	v02Event := event.(*Event)
+	var v02Event Event
+	if reflect.ValueOf(event).Kind() == reflect.Ptr {
+		v02Event = *(event.(*Event))
+	} else {
+		v02Event = event.(Event)
+	}
 
 	contentType := v02Event.ContentType
 	if contentType == "" {
@@ -127,7 +132,7 @@ func (j *jsonhttpCloudEventConverter) Read(t reflect.Type, req *http.Request) (c
 	return ret, nil
 }
 
-func (j *jsonhttpCloudEventConverter) Write(t reflect.Type, req *http.Request, event cloudevents.Event) error {
+func (j *jsonhttpCloudEventConverter) Write(t reflect.Type, req *http.Request, event cloudevents.EventReader) error {
 	buffer := bytes.Buffer{}
 	if err := json.NewEncoder(&buffer).Encode(event); err != nil {
 		return err
@@ -181,8 +186,13 @@ func (b *binaryHTTPCloudEventConverter) Read(t reflect.Type, req *http.Request) 
 	return &event, nil
 }
 
-func (b *binaryHTTPCloudEventConverter) Write(t reflect.Type, req *http.Request, event cloudevents.Event) error {
-	e := event.(*Event)
+func (b *binaryHTTPCloudEventConverter) Write(t reflect.Type, req *http.Request, event cloudevents.EventReader) error {
+	var e Event
+	if reflect.ValueOf(event).Kind() == reflect.Ptr {
+		e = *(event.(*Event))
+	} else {
+		e = event.(Event)
+	}
 	if err := e.MarshalBinary(req); err != nil {
 		return err
 	}
