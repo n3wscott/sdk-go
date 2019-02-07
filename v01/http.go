@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"reflect"
 	"strings"
+	"time"
 )
 
 // HTTPFormat type wraps supported modes of formatting CloudEvent as HTTP request.
@@ -53,6 +54,9 @@ func (e Event) MarshalBinary(req *http.Request) error {
 		val := field.Interface()
 		if url, ok := val.(url.URL); ok {
 			val = url.String()
+		}
+		if timestamp, ok := val.(*time.Time); ok {
+			val = timestamp.Format(time.RFC3339Nano)
 		}
 		header.Set(opts.name, fmt.Sprintf("%v", val))
 	}
