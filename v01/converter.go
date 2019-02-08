@@ -71,7 +71,7 @@ func (e HTTPMarshaller) ToRequest(req *http.Request, event cloudevents.EventRead
 
 	contentType := v01Event.ContentType
 	if contentType == "" {
-		contentType = "application/cloudevents+json"
+		contentType = "application/json"
 	}
 
 	mimeType, _, err := mime.ParseMediaType(contentType)
@@ -198,4 +198,3 @@ func (b *binaryHTTPCloudEventConverter) Write(t reflect.Type, req *http.Request,
 	}
 	return nil
 }
-
