@@ -5,12 +5,16 @@ import "reflect"
 // Allocate allocates a new instance of type t and returns:
 // asPtr is of type t if t is a pointer type and of type &t otherwise
 // asValue is a Value of type t pointing to the same data as asPtr
-func Allocate(obj interface{}) (asPtr interface{}, asValue reflect.Value) {
+func Allocate(obj interface{}) (interface{}, reflect.Value) {
 	if obj == nil {
 		return nil, reflect.Value{}
 	}
 
-	switch t := reflect.TypeOf(obj); t.Kind() {
+	return AllocateFromType(reflect.TypeOf(obj))
+}
+
+func AllocateFromType(t reflect.Type) (asPtr interface{}, asValue reflect.Value) {
+	switch t.Kind() {
 	case reflect.Ptr:
 		reflectPtr := reflect.New(t.Elem())
 		asPtr = reflectPtr.Interface()
