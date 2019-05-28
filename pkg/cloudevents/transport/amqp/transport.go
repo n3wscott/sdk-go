@@ -26,7 +26,7 @@ type Transport struct {
 
 	// AMQP
 	Client  *amqp.Client
-	Session *amqp.Session
+	Session *amqp.Session // Could be many sessions for a single client.
 	Sender  *amqp.Sender
 
 	Queue string
@@ -62,7 +62,7 @@ func New(server, queue string, opts ...Option) (*Transport, error) {
 	}
 	t.Session = session
 
-	t.senderLinkOpts = append(t.senderLinkOpts, amqp.LinkTargetAddress(queue))
+	t.senderLinkOpts = append(t.senderLinkOpts, amqp.LinkTargetAddress(queue)) // Queue or topic.
 
 	// Create a sender
 	sender, err := session.NewSender(t.senderLinkOpts...)
