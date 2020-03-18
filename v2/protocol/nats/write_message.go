@@ -28,20 +28,12 @@ func WriteMsg(ctx context.Context, m binding.Message, natsMessage *nats.Msg, tra
 
 type natsMessageWriter nats.Msg
 
-func (b *natsMessageWriter) SetStructuredEvent(ctx context.Context, f format.Format, event io.Reader) error {
+func (b *natsMessageWriter) SetStructuredEvent(_ context.Context, _ format.Format, event io.Reader) error {
 	val, err := ioutil.ReadAll(event)
 	if err != nil {
 		return err
 	}
 	b.Data = val
-	return nil
-}
-
-func (b *natsMessageWriter) Start(ctx context.Context) error {
-	return nil
-}
-
-func (b *natsMessageWriter) End(ctx context.Context) error {
 	return nil
 }
 
