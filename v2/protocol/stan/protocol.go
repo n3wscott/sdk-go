@@ -13,8 +13,7 @@ var ErrSubscriptionAlreadyOpen = errors.New("subscription already open")
 // Protocol is a reference implementation for using the CloudEvents binding
 // integration. Protocol acts as both a STAN client and a STAN handler.
 type Protocol struct {
-	Conn    stan.Conn
-	Subject string
+	Conn stan.Conn
 
 	Consumer        *Consumer
 	consumerOptions []ConsumerOption
@@ -26,13 +25,13 @@ type Protocol struct {
 }
 
 // New creates a new STAN protocol including managing the lifecycle of the connection
-func NewProtocol(clusterID, clientID, subject string, stanOpts []stan.Option, opts ...ProtocolOption) (*Protocol, error) {
+func NewProtocol(clusterID, clientID, sendSubject, receiveSubject string, stanOpts []stan.Option, opts ...ProtocolOption) (*Protocol, error) {
 	conn, err := stan.Connect(clusterID, clientID, stanOpts...)
 	if err != nil {
 		return nil, err
 	}
 
-	p, err := NewProtocolFromConn(conn, subject, opts...)
+	p, err := NewProtocolFromConn(conn, sendSubject, receiveSubject, opts...)
 	if err != nil {
 		if err2 := conn.Close(); err2 != nil {
 			return nil, fmt.Errorf("failed to close conn: %s, when recovering from err: %w", err2, err)
@@ -46,22 +45,21 @@ func NewProtocol(clusterID, clientID, subject string, stanOpts []stan.Option, op
 }
 
 // NewProtocolFromConn creates a new STAN protocol but leaves managing the lifecycle of the connection up to the caller
-func NewProtocolFromConn(conn stan.Conn, subject string, opts ...ProtocolOption) (*Protocol, error) {
+func NewProtocolFromConn(conn stan.Conn, sendSubject, receiveSubject string, opts ...ProtocolOption) (*Protocol, error) {
 	var err error
 	p := &Protocol{
-		Conn:    conn,
-		Subject: subject,
+		Conn: conn,
 	}
 
 	if err := p.applyOptions(opts...); err != nil {
 		return nil, err
 	}
 
-	if p.Consumer, err = NewConsumerFromConn(conn, subject, p.consumerOptions...); err != nil {
+	if p.Consumer, err = NewConsumerFromConn(conn, receiveSubject, p.consumerOptions...); err != nil {
 		return nil, err
 	}
 
-	if p.Sender, err = NewSenderFromConn(conn, subject, p.senderOptions...); err != nil {
+	if p.Sender, err = NewSenderFromConn(conn, sendSubject, p.senderOptions...); err != nil {
 		return nil, err
 	}
 

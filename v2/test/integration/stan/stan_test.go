@@ -98,10 +98,7 @@ func testProtocol(t testing.TB, natsConn *nats.Conn, opts ...ce_stan.ProtocolOpt
 	subject := "test-ce-client-" + uuid.New().String()
 
 	// use NewProtocol rather than individual Consumer and Sender since this gives us more coverage
-	p, err := ce_stan.NewProtocol(TEST_CLUSTER_ID, TEST_CLIENT_ID, subject,
-		ce_stan.StanOptions(stan.NatsConn(natsConn)),
-		opts...,
-	)
+	p, err := ce_stan.NewProtocol(TEST_CLUSTER_ID, TEST_CLIENT_ID, subject, subject, ce_stan.StanOptions(stan.NatsConn(natsConn)), opts...)
 	require.NoError(t, err)
 
 	go func() {
