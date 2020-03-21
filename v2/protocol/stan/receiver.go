@@ -71,7 +71,7 @@ func (r *Receiver) applyOptions(opts ...ReceiverOption) error {
 // - protocol.Closer
 // - protocol.Receiver
 type Consumer struct {
-	*Receiver
+	Receiver
 
 	Conn               stan.Conn
 	Subject            string
@@ -103,14 +103,26 @@ func NewConsumer(clusterID, clientID, subject string, stanOpts []stan.Option, op
 
 func NewConsumerFromConn(conn stan.Conn, subject string, opts ...ConsumerOption) (*Consumer, error) {
 	c := &Consumer{
-		Conn:    conn,
-		Subject: subject,
+		Conn:       conn,
+		Subject:    subject,
+		Subscriber: &RegularSubscriber{},
 	}
 
 	err := c.applyOptions(opts...)
 	if err != nil {
 		return nil, err
 	}
+
+	receiverOps, err := c.createReceiverOptions()
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := NewReceiver(receiverOps...)
+	if err != nil {
+		return nil, err
+	}
+	c.Receiver = *r
 
 	return c, nil
 }
@@ -123,21 +135,11 @@ func (c *Consumer) OpenInbound(ctx context.Context) error {
 		return ErrSubscriptionAlreadyOpen
 	}
 
-	receiverOps, err := c.createReceiverOptions()
-	if err != nil {
-		return err
-	}
-
-	if c.Receiver, err = NewReceiver(receiverOps...); err != nil {
-		return err
-	}
-
 	c.sub, err = c.Subscriber.Subscribe(c.Conn, c.Subject, c.Receiver.MsgHandler, c.subscriptionOptions...)
 	if err != nil {
 		c.sub = nil
 		return err
 	}
-
 	<-ctx.Done()
 
 	return nil

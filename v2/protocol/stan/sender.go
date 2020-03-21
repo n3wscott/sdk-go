@@ -53,9 +53,19 @@ func NewSenderFromConn(conn stan.Conn, subject string, opts ...SenderOption) (*S
 	return s, nil
 }
 
-func (s *Sender) Send(ctx context.Context, in binding.Message) error {
+func (s *Sender) Send(ctx context.Context, in binding.Message) (err error) {
+	defer func() {
+		if err2 := in.Finish(err); err2 != nil {
+			if err == nil {
+				err = err2
+			} else {
+				err = fmt.Errorf("failed to call in.Finish() when error already occurred: %s: %w", err2.Error(), err)
+			}
+		}
+	}()
+
 	writer := new(bytes.Buffer)
-	if err := WriteMsg(ctx, in, writer, s.Transformers); err != nil {
+	if err = WriteMsg(ctx, in, writer, s.Transformers); err != nil {
 		return err
 	}
 	return s.Conn.Publish(s.Subject, writer.Bytes())

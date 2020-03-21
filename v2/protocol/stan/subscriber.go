@@ -8,17 +8,17 @@ type Subscriber interface {
 		opts ...stan.SubscriptionOption) (stan.Subscription, error)
 }
 
-// StandardSubscriber creates standard subscriptions
-type StandardSubscriber struct {
+// RegularSubscriber creates regular subscriptions
+type RegularSubscriber struct {
 }
 
 // Subscribe implements Subscriber.Subscribe
-func (s *StandardSubscriber) Subscribe(conn stan.Conn, subject string, cb stan.MsgHandler,
+func (s *RegularSubscriber) Subscribe(conn stan.Conn, subject string, cb stan.MsgHandler,
 	opts ...stan.SubscriptionOption) (stan.Subscription, error) {
 	return conn.Subscribe(subject, cb, opts...)
 }
 
-var _ Subscriber = (*StandardSubscriber)(nil)
+var _ Subscriber = (*RegularSubscriber)(nil)
 
 // QueueSubscriber creates queue subscriptions
 type QueueSubscriber struct {
