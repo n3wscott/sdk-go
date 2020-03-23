@@ -1,4 +1,4 @@
-package nats
+package stan
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 // Fill the provided writer with the bindings.Message m.
 // Using context you can tweak the encoding processing (more details on binding.Write documentation).
 func WriteMsg(ctx context.Context, m binding.Message, writer io.ReaderFrom, transformers binding.TransformerFactories) error {
-	structuredWriter := &natsMessageWriter{writer}
+	structuredWriter := &stanMessageWriter{writer}
 
 	_, err := binding.Write(
 		ctx,
@@ -22,15 +22,16 @@ func WriteMsg(ctx context.Context, m binding.Message, writer io.ReaderFrom, tran
 	return err
 }
 
-type natsMessageWriter struct {
+type stanMessageWriter struct {
 	io.ReaderFrom
 }
 
-func (w *natsMessageWriter) SetStructuredEvent(_ context.Context, _ format.Format, event io.Reader) error {
+func (w *stanMessageWriter) SetStructuredEvent(_ context.Context, _ format.Format, event io.Reader) error {
 	if _, err := w.ReadFrom(event); err != nil {
 		return err
 	}
+
 	return nil
 }
 
-var _ binding.StructuredWriter = (*natsMessageWriter)(nil) // Test it conforms to the interface
+var _ binding.StructuredWriter = (*stanMessageWriter)(nil) // Test it conforms to the interface

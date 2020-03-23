@@ -10,8 +10,10 @@ require (
 	github.com/gorilla/mux v1.6.2
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lightstep/tracecontext.go v0.0.0-20181129014701-1757c391b1ac
-	github.com/nats-io/nats-server/v2 v2.1.4 // indirect
+	github.com/nats-io/nats-server/v2 v2.1.4
+	github.com/nats-io/nats-streaming-server v0.17.0 // indirect
 	github.com/nats-io/nats.go v1.9.1
+	github.com/nats-io/stan.go v0.6.0
 	github.com/pkg/errors v0.8.1
 	github.com/prometheus/procfs v0.0.8 // indirect
 	github.com/stretchr/testify v1.5.1
